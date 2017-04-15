@@ -10,11 +10,17 @@ class population:
 
     def __init__(self, user):
         self.generation = start_gen
+        self.user = user
         self.size = population_size
         self.dna = []
+        self.mutation_rate = mutation_rate
+        print("generation",self.generation)
+        print()
         for i in range(self.size):
             self.dna.append(dna(user))
-            print(self.dna[i].gene)
+            print(self.dna[i].gene,self.dna[i].fitness)
+        print()
+        print()
 
     def generated(self):
         for i in range(self.size):
@@ -24,42 +30,74 @@ class population:
 
     def reproduce(self):
         pool = []
-        self.dna = []
         self.generation+=1
+        print("generation",self.generation)
+        print()
         for i in range(self.size):
-            for _ in range(math.floor(self.dna[i].fitness)):
+            for _ in range(math.floor(self.dna[i].fitness*100)):
                 pool.append(self.dna[i].gene)
+
+        
+        for i in range(self.size):
             parent1 = pool[random.randint(0,len(pool)-1)]
             parent2 = pool[random.randint(0,len(pool)-1)]
-            self.dna.append(cross_over(parent1,parent2))
+            self.dna[i].alter_dna(self.cross_over(parent1,parent2))
+            self.mutate(self.dna[i])
+            print(self.dna[i].gene, self.dna[i].fitness)
 
+        print()
+        print()
+
+        
     def cross_over(self, a, b):
         mid = random.randint(1,len(a)-1)
         new_dna = ""
         for i in range(len(a)):
-            if i < mid
+            if i < mid:
+                new_dna = new_dna + a[i]
+            else:
+                new_dna = new_dna + b[i]
+        return new_dna
+
+    def mutate(self,dna):
+        new_gene = ""
+        #print(len(dna.gene))
+        for i in range(len(dna.gene)):
+            if random.random() <= self.mutation_rate:
+                new_gene = new_gene + dna.genes()
+            else:
+                new_gene = new_gene + dna.gene[i]
+
+        dna.gene = new_gene
+        
+                
 
 class dna:
 
 
     def __init__(self, user):
         self.size = len(user)
+        self.user = user
         self.gene = ""
         for i in range(self.size):
             self.gene = self.gene+ self.genes()
 
-        self.fitness = self.fitness_function(user)/float(len(user))
+        self.fitness = self.fitness_function()/float(len(user))
 
     def genes(self):
         outcomes = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',' ']
         return outcomes[random.randint(0,len(outcomes)-1)]
 
-    def finess_function(self, user):
+    def fitness_function(self):
         score = 0
-        for i in range(user):
-            if i == self.gene[i]:
+        for i in range(len(self.user)):
+            if self.user[i] == self.gene[i]:
                 score+=1
         return score
+
+    def alter_dna(self,new_gene):
+        self.gene = new_gene
+        self.fitness = self.fitness_function()/float(len(user))
             
 
 user = input("Enter the phrase to be genetically generated:")
